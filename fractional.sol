@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 
-import './SampleERC20.sol';
+import './sampleerc20.sol';
 interface IERC721  {
     
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
@@ -90,18 +90,35 @@ abstract contract ReentrancyGuard {
     }
 }
 contract DragonFractionalNFT is ReentrancyGuard{
-    //FractionsContract public fractions;
+/* 
+ contract address of the NFT Contract which will be used
+ */
     IERC721 public dragonNFT;
+
+    /* 
+    Mapping of ERC20 contracts that will be the fraction tokens of and to the tokenId
+     */
     mapping(uint256 => FractionsContract) public fractions;
     event fractionCreated(
         uint256 indexed tokenId,
         address fractioncontract,
         uint256 fractions
     );
-
-    constructor(IERC721 nftAddress){
+    /* 
+    Initializes the Contract
+    @param nftAddress is the contract address of NFT Contract
+    @dev sets the nft contract
+     */
+    constructor(IERC721 nftAddress) {
         dragonNFT = nftAddress;
     }
+    /* 
+    @dev Creates fractions of a given token id
+    @dev transfers the token to the contract address
+    @dev deploys ERC20 contract and mints ERC20 token
+    @param tokenId of the nft 
+    @param fracs is the amount of fraction to be made
+     */
     function createFractionalNFT(uint256 tokenId, uint256 fracs) external nonReentrant {
         require(address(fractions[tokenId]) == address(0));
         FractionsContract newc = new FractionsContract(tokenId);
@@ -110,9 +127,17 @@ contract DragonFractionalNFT is ReentrancyGuard{
         FractionsContract(newc).mint(msg.sender, fracs);
         emit fractionCreated(tokenId, address(newc), fracs);
     }
+
+    /* 
+    @return the amount of fractions of a given nft id
+     */
     function checkFractionNumber(uint256 tokenId) external view returns(uint256){
         return (FractionsContract(fractions[tokenId]).totalSupply());
     }
+    
+    /* 
+    @return the address of erc20 contract which is the fractional token contract of a given tokenId
+     */
     function checkFractionalContract(uint256 tokenId) external view returns(address){
         return(address(fractions[tokenId]));
     }
