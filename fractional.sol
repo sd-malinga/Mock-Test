@@ -120,7 +120,7 @@ contract DragonFractionalNFT is ReentrancyGuard{
     @param fracs is the amount of fraction to be made
      */
     function createFractionalNFT(uint256 tokenId, uint256 fracs) external nonReentrant {
-        require(address(fractions[tokenId]) == address(0));
+        require(address(fractions[tokenId]) == address(0), "Already Fractionalized");
         FractionsContract newc = new FractionsContract(tokenId);
         fractions[tokenId] = newc;
         dragonNFT.transferFrom(msg.sender, address(this), tokenId);
