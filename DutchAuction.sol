@@ -103,9 +103,11 @@ contract dutchAuction is ReentrancyGuard {
         @return the current price of each token of a particular NFT
     */
     function checkPrice(uint256 tokenId) public view returns(uint256) {
+        if(block.timestamp - auctionInfo[tokenId].startAt > 3600){
         uint256 timeElapsed = block.timestamp - auctionInfo[tokenId].startAt / (60*60);
         uint256 discount = auctionInfo[tokenId].discountRate * timeElapsed / (100*100);
         return (auctionInfo[tokenId].startingPrice - discount);
+        } else return (auctionInfo[tokenId].startingPrice);
     }
     /* 
     @dev checks whether an auction is live or not
